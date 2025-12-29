@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DOGEMINER PRO V2</title>
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+
+<link rel="icon" href="https://i.ibb.co/qMhWGqgG/file-00000000eab07208873c6595f871ed5f.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js">
+/* SIMPLE PAYMENT NOTE UPDATE */
+function updatePaymentNote(coin){
+ const note=document.querySelector('.payment-info h3');
+ if(note){
+   note.innerText = '🔑 How to Get Mining Key ('+coin+' Payment)';
+ }
+}
+
+</script>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Segoe UI,sans-serif;
+ color:#fff;
+ background:#000;
+ overflow:hidden;
+}
+
+/* BACKGROUND */
+.bg{
+ position:fixed;inset:-10%;
+ background:url("https://i.ibb.co/mgCp1xJ/file-00000000f17c71fa8fde683e5ae4f987.png") center/cover no-repeat;
+ z-index:-3;
+}
+.overlay{position:fixed;inset:0;background:#0004;z-index:-2}
+
+/* SPLASH */
+#splash{
+ position:fixed;inset:0;
+ display:flex;align-items:center;justify-content:center;
+ background:#000;z-index:99;
+}
+#splash img{
+ width:150px;border-radius:50%;
+ box-shadow:0 0 60px #00eaff;
+}
+
+/* APP */
+.app{
+ max-width:360px;
+ margin:auto;
+ padding:14px 14px 40px; /* bottom safe */
+ display:none;
+ height:100vh;
+ overflow-y:auto;
+}
+
+/* ICON */
+.icon{
+ width:96px;height:96px;
+ margin:10px auto;
+ border-radius:50%;
+ box-shadow:0 0 35px #00eaff;
+ animation:float 3s ease-in-out infinite;
+}
+@keyframes float{
+ 50%{transform:translateY(-6px) scale(1.05)}
+}
+.icon img{width:100%;border-radius:50%}
+
+/* TITLE */
+.title{
+ text-align:center;
+ font-size:22px;
+ font-weight:900;
+}
+
+/* CARD */
+.card{
+ background:#0008;
+ border:1.5px solid #00eaff55;
+ border-radius:14px;
+ padding:12px;
+ margin-top:12px;
+}
+
+/* BALANCE */
+.balance{
+ text-align:center;
+ font-size:20px;
+ font-weight:900;
+ color:#00ffcc;
+ text-shadow:0 0 15px #00eaff;
+}
+
+/* INPUT */
+input{
+ width:100%;
+ height:44px;
+ padding:0 12px;
+ border-radius:12px;
+ border:none;
+ font-size:14px;
+ outline:none;
+}
+
+/* BUTTONS (MOBILE SAFE) */
+.btn{
+ width:100%;
+ height:48px;
+ border:none;
+ border-radius:24px;
+ font-weight:800;
+ font-size:15px;
+ margin-top:10px;
+ cursor:pointer;
+ transition:transform 0.2s, opacity 0.2s;
+}
+.btn:active{
+ transform:scale(0.98);
+ opacity:0.9;
+}
+
+.green{background:linear-gradient(135deg,#00ff88,#00aa55)}
+.red{background:linear-gradient(135deg,#ff4d4d,#b30000)}
+.purple{background:linear-gradient(135deg,#b16cff,#6a00ff)}
+.gold{background:linear-gradient(135deg,#ffd700,#ff9f00)}
+.blue{background:linear-gradient(135deg,#00bfff,#0066ff)}
+
+/* ===== MINING FX ===== */
+.mining-card{text-align:center}
+
+.miner-core{
+ width:110px;height:110px;margin:12px auto;
+ border-radius:50%;
+ background:radial-gradient(circle,#00eaff,#001d2d);
+ box-shadow:0 0 40px #00eaff;
+ position:relative;
+}
+.core{
+ position:absolute;inset:24px;
+ border-radius:50%;
+ background:radial-gradient(circle,#fff,#00eaff);
+ opacity:.85;
+}
+
+.hash-lines{
+ display:flex;justify-content:space-between;
+ margin:8px 0;
+}
+.hash-lines span{
+ width:22%;height:3px;
+ background:linear-gradient(90deg,transparent,#00eaff,transparent);
+ opacity:.35;
+}
+
+.coin-zone{
+ height:56px;
+ position:relative;
+ overflow:hidden;
+}
+.coin{
+ position:absolute;left:50%;
+ transform:translateX(-50%);
+ font-size:26px;color:gold;opacity:0;
+}
+
+/* HISTORY */
+.history{font-size:12px}
+.entry{
+ padding:6px 0;
+ border-bottom:1px solid #00eaff33;
+}
+
+/* TOAST */
+#toast{
+ position:fixed;
+ bottom:16px;
+ left:50%;
+ transform:translateX(-50%);
+ background:#111;
+ padding:14px 22px;
+ border-radius:30px;
+ font-weight:700;
+ box-shadow:0 0 25px #00eaff;
+ z-index:200;
+ opacity:0;
+}
+.success{color:#00ff88}
+.error{color:#ff4d4d}
+.info{color:#00bfff}
+
+/* BUY KEY MODAL */
+.modal{
+ position:fixed;
+ inset:0;
+ background:#000c;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ z-index:300;
+ opacity:0;
+ pointer-events:none;
+ transition:opacity 0.3s;
+}
+.modal.active{
+ opacity:1;
+ pointer-events:all;
+}
+.modal-content{
+ background:#000;
+ border:2px solid #00eaff;
+ border-radius:20px;
+ padding:20px;
+ width:90%;
+ max-width:340px;
+ max-height:80vh;
+ overflow-y:auto;
+}
+.modal-header{
+ display:flex;
+ justify-content:space-between;
+ align-items:center;
+ margin-bottom:15px;
+}
+.modal-title{
+ font-size:18px;
+ font-weight:900;
+ color:#00eaff;
+}
+.modal-close{
+ background:none;
+ border:none;
+ color:#fff;
+ font-size:24px;
+ cursor:pointer;
+ line-height:1;
+}
+.crypto-grid{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+ margin:15px 0;
+}
+.crypto-option{
+ background:#001122;
+ border:1px solid #00eaff44;
+ border-radius:10px;
+ padding:12px;
+ text-align:center;
+ cursor:pointer;
+ transition:all 0.2s;
+}
+.crypto-option:hover{
+ background:#002244;
+ border-color:#00eaff;
+}
+.crypto-name{
+ font-size:14px;
+ font-weight:700;
+ margin-bottom:5px;
+}
+.crypto-amount{
+ font-size:12px;
+ color:#00ffaa;
+}
+.crypto-address{
+ font-size:11px;
+ word-break:break-all;
+ background:#000;
+ padding:8px;
+ border-radius:8px;
+ margin-top:10px;
+ border:1px solid #00eaff33;
+}
+.copy-btn{
+ background:#00eaff22;
+ color:#00eaff;
+ border:1px solid #00eaff;
+ border-radius:6px;
+ padding:5px 10px;
+ font-size:11px;
+ cursor:pointer;
+ margin-top:8px;
+ width:100%;
+}
+.payment-info{
+ background:#001a33;
+ border:1px solid #00eaff;
+ border-radius:10px;
+ padding:12px;
+ margin:15px 0;
+ font-size:12px;
+}
+.payment-info p{
+ margin:5px 0;
+}
+.telegram-link{
+ display:block;
+ text-align:center;
+ background:linear-gradient(135deg,#0088cc,#006699);
+ color:white;
+ padding:12px;
+ border-radius:10px;
+ text-decoration:none;
+ font-weight:700;
+ margin-top:15px;
+}
+.telegram-link:hover{
+ background:linear-gradient(135deg,#0099dd,#0077aa);
+}
+</style>
+</head>
+
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+<img src="https://i.ibb.co/qMhWGqgG/file-00000000eab07208873c6595f871ed5f.png">
+</div>
+
+<!-- BUY KEY MODAL -->
+<div id="buyKeyModal" class="modal">
+<div class="modal-content">
+ <div class="modal-header">
+  <div class="modal-title">BUY MINING KEY - $10</div>
+  <button class="modal-close" onclick="closeBuyModal()">&times;</button>
+ </div>
+ 
+ 
+ 
+ 
+<div class="payment-info" style="margin-top:16px; background:#0f1220; border:2px solid #00eaff; border-radius:12px; padding:14px">
+  <h3 style="margin:0 0 10px 0; color:#00eaff;">🔑 How to Get Mining Key (2 Seconds Guide)</h3>
+  <ol style="padding-left:18px; line-height:1.6; font-size:15px">
+    <li><b>Select a payment method</b> (USDT / DOGE / BTC etc.)</li>
+    <li><b>Copy the wallet address</b> shown on screen</li>
+    <li><b>Send exact amount</b> on the same network</li>
+    <li><b>Take payment screenshot + TXID</b></li>
+    <li><b>Click Telegram button</b> and send screenshot</li>
+    <li><b>Mining Key will be activated</b> within minutes</li>
+  </ol>
+  <p style="color:#ff5c5c; margin:8px 0 0 0;">
+    ⚠️ Wrong network or wrong amount = NO REFUND
+  </p>
+</div>
+
+<a href="https://t.me/CryptoMinerApp10" target="_blank" class="telegram-link">
+  TELEGRAM: @CryptoMinerApp10
+ </a>
+ 
+ <div class="crypto-grid" id="cryptoGrid">
+  <!-- Crypto options will be added here by JavaScript -->
+ </div>
+ 
+ <div style="text-align:center; margin-top:15px;">
+  <button class="btn blue" onclick="closeBuyModal()">CLOSE</button>
+ </div>
+</div>
+</div>
+
+<div class="bg"></div>
+<div class="overlay"></div>
+
+<div class="app" id="app">
+
+<div class="icon">
+<img src="https://i.ibb.co/qMhWGqgG/file-00000000eab07208873c6595f871ed5f.png">
+</div>
+
+<div class="title">DOGEMINER PRO V2</div>
+
+<div class="card">
+<div class="balance">
+<span id="balance">0.000000</span> DOGE
+</div>
+</div>
+
+<div class="card">
+<input id="keyInput" placeholder="Enter mining key">
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+ <button class="btn purple" onclick="verifyKey()">VERIFY KEY</button>
+ <button class="btn blue" onclick="openBuyModal()">BUY KEY ($10)</button>
+</div>
+</div>
+
+<div class="card mining-card">
+<div class="miner-core"><div class="core"></div></div>
+
+<div class="hash-lines">
+ <span></span><span></span><span></span><span></span>
+</div>
+
+<div class="coin-zone"></div>
+
+<button class="btn green" id="mineBtn" onclick="toggleMining()">
+START MINING
+</button>
+</div>
+
+<div class="card">
+<input id="walletInput" placeholder="Paste DOGE wallet address">
+</div>
+
+<div class="card">
+<button class="btn gold" onclick="withdraw()">WITHDRAW (Min 10 DOGE)</button>
+</div>
+
+<div class="card">
+<b style="font-size:13px">Withdrawal History</b>
+<div id="history" class="history"></div>
+</div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* SPLASH */
+gsap.fromTo("#splash img",{scale:.6,opacity:0},{scale:1.1,opacity:1,duration:1.4});
+gsap.to("#splash img",{scale:1,repeat:-1,yoyo:true,duration:1.2});
+setTimeout(()=>{
+ gsap.to("#splash",{opacity:0,duration:.6,onComplete:()=>{
+  splash.style.display="none";
+  app.style.display="block";
+ }});
+},2200);
+
+/* BACKGROUND */
+gsap.to(".bg",{x:-40,scale:1.1,duration:22,repeat:-1,yoyo:true,ease:"sine.inOut"});
+
+/* TOAST */
+const toastEl=document.getElementById("toast");
+function toast(msg,type){
+ toastEl.className=type;
+ toastEl.innerText=msg;
+ gsap.to(toastEl,{opacity:1,y:0,duration:.4});
+ setTimeout(()=>gsap.to(toastEl,{opacity:0,y:20,duration:.4}),2000);
+}
+
+/* DATA */
+const KEY="HMR-XXZ-MINER";
+let verified=localStorage.getItem("key_ok")==="1";
+let mining=false;
+let balance=parseFloat(localStorage.getItem("balance"))||0;
+let wallet=localStorage.getItem("wallet")||"";
+let history=JSON.parse(localStorage.getItem("hist")||"[]");
+
+walletInput.value=wallet;
+
+/* CRYPTO PAYMENT OPTIONS */
+const cryptoOptions = [
+ {name: "BTC", address: "bc1qkrvuxrrjm9t96jdng86mhep29rvf4ezupepakx", amount: "0.000115 BTC"},
+ {name: "USDT-BEP20", address: "0x8Ed272B8003eC72F434929EB7E712dea2772A360", amount: "10 USDT"},
+ {name: "USDT-TRC20", address: "TNF2n1mc56nbXwHi1FXrXckXc74RWuYDux", amount: "10 USDT"},
+ {name: "USDT-ERC20", address: "0x8Ed272B8003eC72F434929EB7E712dea2772A360", amount: "10 USDT"},
+ {name: "BNB", address: "0x8Ed272B8003eC72F434929EB7E712dea2772A360", amount: "0.0118 BNB"},
+ {name: "POLYGON", address: "0x8Ed272B8003eC72F434929EB7E712dea2772A360", amount: "118 POL"},
+ {name: "TRX", address: "TNF2n1mc56nbXwHi1FXrXckXc74RWuYDux", amount: "35 TRX"},
+ {name: "LITECOIN", address: "LS8Cb6ve24tRaULwj9XfoYJDcRTbSbKr2s", amount: "0.125 LTC"},
+ {name: "ETHEREUM", address: "0x8Ed272B8003eC72F434929EB7E712dea2772A360", amount: "0.0035 ETH"},
+ {name: "SOLANA", address: "BJRbjgLW13DwKkJvCTyXG9WTZoNVB4FQRsBKh4jN3TPH", amount: "0.080 SOL"},
+ {name: "DOGECOIN", address: "DBdHkdK9cSnTsbSU7fC3UsEScGk3Vh5MQj", amount: "82 DOGE"},
+ {name: "TON", address: "UQDwLjzEqoCRkfGHyyPf7ltrf77ns0uJ-M6L9AY_o2jrcvtM", amount: "7.3 TON"},
+ {name: "USDC-ERC20", address: "0x8Ed272B8003eC72F434929EB7E712dea2772A360", amount: "10 USDC"},
+ {name: "USDC-BEP20", address: "0x8Ed272B8003eC72F434929EB7E712dea2772A360", amount: "10 USDC"},
+ {name: "USDC-SOL", address: "BJRbjgLW13DwKkJvCTyXG9WTZoNVB4FQRsBKh4jN3TPH", amount: "10 USDC"}
+];
+
+/* UI */
+function updateBalance(){
+ document.getElementById("balance").innerText=balance.toFixed(6);
+}
+
+/* BUY KEY MODAL */
+function openBuyModal() {
+ const modal = document.getElementById("buyKeyModal");
+ const grid = document.getElementById("cryptoGrid");
+ 
+ // Clear previous options
+ grid.innerHTML = '';
+ 
+ // Add crypto options
+ cryptoOptions.forEach(crypto => {
+  const option = document.createElement("div");
+  option.className = "crypto-option";
+  option.innerHTML = `
+   <div class="crypto-name">${crypto.name}</div>
+   <div class="crypto-amount">${crypto.amount}</div>
+   <div class="crypto-address">${crypto.address}</div>
+   <button class="copy-btn" onclick="copyToClipboard('${crypto.address}', '${crypto.name}')">COPY ADDRESS</button>
+  `;
+  grid.appendChild(option);
+ });
+ 
+ modal.classList.add("active");
+ gsap.fromTo(".modal-content", {scale: 0.8, opacity: 0}, {scale: 1, opacity: 1, duration: 0.3});
+}
+
+function closeBuyModal() {
+ const modal = document.getElementById("buyKeyModal");
+ modal.classList.remove("active");
+}
+
+/* COPY TO CLIPBOARD */
+function copyToClipboard(text, cryptoName) {
+ navigator.clipboard.writeText(text)
+  .then(() => {
+   toast(`Copied ${cryptoName} address!`, "success");
+  })
+  .catch(err => {
+   console.error('Failed to copy: ', err);
+   toast("Failed to copy address", "error");
+  });
+}
+
+/* KEY VERIFICATION */
+function verifyKey(){
+ if(keyInput.value.trim()===KEY){
+  verified=true;
+  localStorage.setItem("key_ok","1");
+  toast("Key Verified - Mining Unlocked!","success");
+  mineBtn.disabled = false;
+ }else{
+  toast("Invalid Key","error");
+  gsap.fromTo(keyInput,{x:-6},{x:6,repeat:6,yoyo:true,duration:.05});
+ }
+}
+
+/* MINING */
+function toggleMining(){
+ if(!verified){toast("Verify key first","error");return;}
+ mining=!mining;
+ mineBtn.className="btn "+(mining?"red":"green");
+ mineBtn.innerText=mining?"STOP MINING":"START MINING";
+ if(mining){
+  toast("Mining Started","success");
+  spawnCoin();
+ }else{
+  toast("Mining Stopped","error");
+ }
+}
+
+/* BALANCE LOOP */
+setInterval(()=>{
+ if(mining){
+  balance+=0.000015+Math.random()*0.00001;
+  localStorage.setItem("balance",balance);
+  updateBalance();
+ }
+},1000);
+
+/* COINS */
+function spawnCoin(){
+ if(!mining) return;
+ let c=document.createElement("div");
+ c.className="coin";c.innerText="₿";
+ document.querySelector(".coin-zone").appendChild(c);
+ gsap.fromTo(c,{y:20,opacity:0,scale:.6},
+  {y:-32,opacity:1,scale:1.2,duration:1,onComplete:()=>c.remove()});
+ setTimeout(spawnCoin,900);
+}
+
+/* WITHDRAW */
+function withdraw(){
+ let addr=walletInput.value.trim();
+ if(addr===""){toast("Paste wallet address","error");return;}
+ if(balance<10){toast("Minimum withdrawal is 10 DOGE","error");return;}
+
+ wallet=addr;
+ localStorage.setItem("wallet",wallet);
+
+ balance-=10;
+ localStorage.setItem("balance",balance);
+
+ history.push({time:new Date().toLocaleString(),amt:10});
+ localStorage.setItem("hist",JSON.stringify(history));
+
+ updateBalance();
+ renderHistory();
+ toast("Withdrawal Requested","success");
+}
+
+/* HISTORY */
+function renderHistory(){
+ let h="";
+ history.slice().reverse().forEach(x=>{
+  h+=`<div class="entry">${x.time} – ${x.amt} DOGE</div>`;
+ });
+ historyEl.innerHTML=h||"No withdrawals";
+}
+const historyEl=document.getElementById("history");
+
+// Initialize
+updateBalance();
+renderHistory();
+
+// Disable mine button if not verified
+if(!verified) {
+ mineBtn.disabled = true;
+}
+
+// Close modal when clicking outside
+document.getElementById('buyKeyModal').addEventListener('click', function(e) {
+ if(e.target === this) {
+  closeBuyModal();
+ }
+});
+
+/* SIMPLE PAYMENT NOTE UPDATE */
+function updatePaymentNote(coin){
+ const note=document.querySelector('.payment-info h3');
+ if(note){
+   note.innerText = '🔑 How to Get Mining Key ('+coin+' Payment)';
+ }
+}
+
+</script>
+
+</body>
+</html>
